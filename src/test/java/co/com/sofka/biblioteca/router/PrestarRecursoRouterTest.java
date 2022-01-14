@@ -1,7 +1,5 @@
 package co.com.sofka.biblioteca.router;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import co.com.sofka.biblioteca.collections.Recurso;
 import co.com.sofka.biblioteca.mapper.RecursoMapper;
 import co.com.sofka.biblioteca.repository.RepositorioRecurso;
@@ -23,6 +21,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest
@@ -48,6 +47,7 @@ class PrestarRecursoRouterTest {
 
         Mono<Recurso> recursoMono = Mono.just(recurso1);
 
+        when(repositorio.save(any())).thenReturn(recursoMono);
         when(repositorio.findById(recurso1.getId())).thenReturn(recursoMono);
 
 
@@ -58,6 +58,36 @@ class PrestarRecursoRouterTest {
                 .expectBody(String.class)
                 .value(userResponse -> {
                             Assertions.assertThat(userResponse.equals("El recurso fue prestado con exito"));
+                        }
+                );
+        Mockito.verify(repositorio,Mockito.times(1)).findById("xxx");
+
+    }
+
+    @Test
+    public void PrestarRecursoTest_Error() {
+        Recurso recurso1 = new Recurso();
+        recurso1.setId("xxx");
+        recurso1.setArea(Area.ARTES);
+        recurso1.setDisponible(false);
+        recurso1.setTipo(Tipo.DOCUMENTAL);
+        recurso1.setNombre("Documental");
+        recurso1.setFecha(LocalDate.now());
+
+        Mono<Recurso> recursoMono = Mono.just(recurso1);
+
+        when(repositorio.findById(recurso1.getId())).thenReturn(recursoMono);
+        when(repositorio.save(any())).thenReturn(recursoMono);
+
+
+
+        webTestClient.put()
+                .uri("/recursos/prestar/xxx")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .value(userResponse -> {
+                            Assertions.assertThat(userResponse).isEqualTo("El recurso no está disponible");
                         }
                 );
         Mockito.verify(repositorio,Mockito.times(1)).findById("xxx");

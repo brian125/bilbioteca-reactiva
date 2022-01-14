@@ -23,6 +23,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest
@@ -38,6 +39,34 @@ class DevolverRecursoRouterTest {
 
     @Test
     public void DevolverRecursoTest() {
+        Recurso recurso1 = new Recurso();
+        recurso1.setId("xxx");
+        recurso1.setArea(Area.ARTES);
+        recurso1.setDisponible(false);
+        recurso1.setTipo(Tipo.DOCUMENTAL);
+        recurso1.setNombre("Documental");
+        recurso1.setFecha(LocalDate.now());
+
+        Mono<Recurso> recursoMono = Mono.just(recurso1);
+
+        when(repositorio.findById(recurso1.getId())).thenReturn(recursoMono);
+        when(repositorio.save(any())).thenReturn(recursoMono);
+
+
+        webTestClient.put()
+                .uri("/recursos/devolver/xxx")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .value(userResponse -> {
+                            Assertions.assertThat(userResponse.equals("El recurso fue devuelto con exito"));
+                        }
+                );
+        Mockito.verify(repositorio,Mockito.times(1)).findById("xxx");
+    }
+
+    @Test
+    public void DevolverRecursoTest_Error() {
         Recurso recurso1 = new Recurso();
         recurso1.setId("xxx");
         recurso1.setArea(Area.ARTES);
