@@ -1,6 +1,7 @@
 package co.com.sofka.biblioteca.router;
 
 import co.com.sofka.biblioteca.dto.RecursoDTO;
+import co.com.sofka.biblioteca.useCases.UseCaseBuscarPorAreaYTipo;
 import co.com.sofka.biblioteca.useCases.UseCaseBuscarPorTipo;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,14 +15,14 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 @Configuration
-public class BuscarPorTipoRouter {
+public class BuscarPorAreaYTipoRouter {
     @Bean
-    public RouterFunction<ServerResponse> buscarPorTipo(UseCaseBuscarPorTipo useCaseBuscarPorTipo) {
+    public RouterFunction<ServerResponse> buscarPorAreaYTipo(UseCaseBuscarPorAreaYTipo useCaseBuscarPorAreaYTipo) {
         return route(
-                GET("/recursos/filtrarTipo/{tipo}").and(accept(MediaType.APPLICATION_JSON)),
+                GET("/recursos/filtrar/{area}/{tipo}").and(accept(MediaType.APPLICATION_JSON)),
                 request -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromPublisher(useCaseBuscarPorTipo.get(request.pathVariable("tipo")), RecursoDTO.class))
+                        .body(BodyInserters.fromPublisher(useCaseBuscarPorAreaYTipo.get(request.pathVariable("area"), request.pathVariable("tipo")), RecursoDTO.class))
         );
     }
 }
