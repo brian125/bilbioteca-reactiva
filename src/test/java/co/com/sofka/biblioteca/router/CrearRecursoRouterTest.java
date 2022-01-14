@@ -60,7 +60,7 @@ class CrearRecursoRouterTest {
         when(repositorio.save(any())).thenReturn(datoMono);
 
         webTestClient.post()
-                .uri("/crear")
+                .uri("/recursos/crear")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .body(Mono.just(recursoDTO), RecursoDTO.class)

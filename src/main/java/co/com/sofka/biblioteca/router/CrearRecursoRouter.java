@@ -17,7 +17,7 @@ public class CrearRecursoRouter {
 
     @Bean
     public RouterFunction<ServerResponse> crearRecursooo(UseCaseCrear useCaseCrear) {
-        return route(POST("/crear").and(accept(MediaType.APPLICATION_JSON)),
+        return route(POST("/recursos/crear").and(accept(MediaType.APPLICATION_JSON)),
                 request -> request.bodyToMono(RecursoDTO.class)
                         .flatMap(recursoDTO -> useCaseCrear.apply(recursoDTO)
                                 .flatMap(result -> ServerResponse.ok()
